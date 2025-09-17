@@ -38,6 +38,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   loading,
   disabled,
 }) => {
+  if (process.env.NODE_ENV !== 'production') console.count('FilterControls render');
   const [applying, setApplying] = React.useState(false);
   const [searchDraft, setSearchDraft] = React.useState(filters.searchText);
   const [priceDraft, setPriceDraft] = React.useState<[number, number]>(filters.priceRange);
@@ -241,4 +242,20 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   );
 };
 
-export default FilterControls;
+function areEqual(prev: FilterControlsProps, next: FilterControlsProps) {
+  const keys: (keyof FilterControlsProps)[] = [
+    'filters', 'onFiltersChange', 'sortBy', 'onSortChange', 'categories', 'priceRange', 'onReset', 'viewMode', 'onViewModeChange', 'loading', 'disabled'
+  ];
+  for (const k of keys) {
+    if (prev[k] !== next[k]) {
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[FilterControls props changed]', k);
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
+export default React.memo(FilterControls, areEqual);

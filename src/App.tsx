@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useTransition } from 'react';
-import { MantineProvider, AppShell, Container, Title, Text, Stack, Group, Badge } from '@mantine/core';
+import React, { useState, useMemo, useTransition, useCallback } from 'react';
+import { AppShell, Container, Title, Text, Stack, Group, Badge } from '@mantine/core';
 import { ProductData, FilterState, Product } from './types/Product';
 import { useFavorites } from './hooks/useFavorites';
 import FileUpload from './components/FileUpload';
@@ -7,12 +7,13 @@ import FilterControls from './components/FilterControls';
 import ProductList from './components/ProductList';
 import ProductTable from './components/ProductTable';
 import ProductDetailModal from './components/ProductDetailModal';
-import { theme } from './theme';
+import MainContent from './components/MainContent';
 import { IconReceipt2 } from '@tabler/icons-react';
-import { Notifications, notifications } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { saveProductDataToDB, getCountsFromDB, loadProductDataFromDB } from './utils/indexedDB';
 
 function App() {
+  if (process.env.NODE_ENV !== 'production') console.count('App render');
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [sortBy, setSortBy] = useState<string>('name_asc');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -112,7 +113,7 @@ function App() {
     }
   };
 
-  const handleResetFilters = () => {
+  const handleResetFilters = useCallback(() => {
     setFilterState({
       category: '',
       priceRange: priceRange,
@@ -120,21 +121,55 @@ function App() {
       favoritesOnly: false,
     });
     setSortBy('name_asc');
-  };
+  }, [priceRange]);
 
-  const handleOpenDetail = (product: Product) => {
+  const handleOpenDetail = useCallback((product: Product) => {
     setSelectedProduct(product);
     setDetailModalOpened(true);
-  };
+  }, []);
 
-  const handleCloseDetail = () => {
+  const handleCloseDetail = useCallback(() => {
     setDetailModalOpened(false);
     setSelectedProduct(null);
-  };
+  }, []);
+
+  // Stable callbacks for children to avoid unnecessary re-renders
+  const handleFiltersChange = useCallback((next: FilterState) => {
+    startTransition(() => setFilterState(next));
+  }, [startTransition]);
+
+  const handleSortChange = useCallback((next: string) => {
+    startTransition(() => setSortBy(next));
+  }, [startTransition]);
+
+  const handleViewModeChange = useCallback((mode: 'grid' | 'table') => {
+    startTransition(() => setViewMode(mode));
+  }, [startTransition]);
+
+  // Memoize MainContent element to avoid recreation on unrelated state updates (e.g., selectedProduct)
+  const mainContent = useMemo(() => {
+    if (!productData) return null;
+    return (
+      <MainContent
+        productData={productData}
+        filters={filterState}
+        sortBy={sortBy}
+        categories={categories}
+        priceRange={priceRange}
+        viewMode={viewMode}
+        onFiltersChange={handleFiltersChange}
+        onSortChange={handleSortChange}
+        onReset={handleResetFilters}
+        onViewModeChange={handleViewModeChange}
+        onOpenDetail={handleOpenDetail}
+        categoriesById={categoriesById}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+      />
+    );
+  }, [productData, filterState, sortBy, categories, priceRange, viewMode, handleFiltersChange, handleSortChange, handleResetFilters, handleViewModeChange, handleOpenDetail, categoriesById, isFavorite, toggleFavorite]);
 
   return (
-    <MantineProvider theme={theme}>
-      <Notifications />
       <AppShell
         header={{ height: 80 }}
         padding="md"
@@ -163,54 +198,20 @@ function App() {
         </AppShell.Header>
 
         <AppShell.Main>
-          <Container size="xl">
-            <Stack gap="lg">
-              {!productData ? (
+          {!productData ? (
+            <Container size="xl">
+              <Stack gap="lg">
                 <div>
                   <Title order={2} mb="md">
                     JSONファイルをアップロード
                   </Title>
                   <FileUpload onFileLoad={handleFileLoad} />
                 </div>
-              ) : (
-                <>
-                  <FilterControls
-                    filters={filterState}
-                    onFiltersChange={(next) => startTransition(() => setFilterState(next))}
-                    sortBy={sortBy}
-                    onSortChange={(next) => startTransition(() => setSortBy(next))}
-                    categories={categories}
-                    priceRange={priceRange}
-                    onReset={() => startTransition(() => handleResetFilters())}
-                    viewMode={viewMode}
-                    onViewModeChange={(mode) => startTransition(() => setViewMode(mode))}
-                    disabled={!productData}
-                  />
-                  {viewMode === 'grid' ? (
-                    <ProductList
-                      products={productData.products}
-                      filters={filterState}
-                      sortBy={sortBy}
-                      onOpenDetail={handleOpenDetail}
-                      categoriesById={categoriesById}
-                      isFavorite={isFavorite}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  ) : (
-                    <ProductTable
-                      products={productData.products}
-                      filters={filterState}
-                      sortBy={sortBy}
-                      onOpenDetail={handleOpenDetail}
-                      categoriesById={categoriesById}
-                      isFavorite={isFavorite}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  )}
-                </>
-              )}
-            </Stack>
-          </Container>
+              </Stack>
+            </Container>
+          ) : (
+            mainContent
+          )}
         </AppShell.Main>
 
         <ProductDetailModal
@@ -222,7 +223,6 @@ function App() {
           categories={selectedProduct ? categoriesById[selectedProduct.id] || (selectedProduct.category ? [selectedProduct.category] : []) : []}
         />
       </AppShell>
-    </MantineProvider>
   );
 }
 

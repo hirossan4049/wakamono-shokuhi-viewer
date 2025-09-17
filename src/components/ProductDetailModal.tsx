@@ -37,6 +37,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onToggleFavorite,
   categories,
 }) => {
+  if (process.env.NODE_ENV !== 'production') console.count('ProductDetailModal render');
   if (!product) return null;
 
   const totalItemPrice = product.items.reduce((sum, item) => sum + (item.price * item.amount), 0);
@@ -174,4 +175,4 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   );
 };
 
-export default ProductDetailModal;
+export default React.memo(ProductDetailModal);

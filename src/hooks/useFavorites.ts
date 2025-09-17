@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 const FAVORITES_KEY = 'wakamono-shokuhi-favorites';
 
@@ -27,7 +27,7 @@ export const useFavorites = () => {
     }
   };
 
-  const toggleFavorite = (productId: string) => {
+  const toggleFavorite = useCallback((productId: string) => {
     setFavorites(prev => {
       const newFavorites = new Set(prev);
       if (newFavorites.has(productId)) {
@@ -38,25 +38,26 @@ export const useFavorites = () => {
       saveFavoritesToStorage(newFavorites);
       return newFavorites;
     });
-  };
+  }, []);
 
-  const isFavorite = (productId: string): boolean => {
+  const isFavorite = useCallback((productId: string): boolean => {
     return favorites.has(productId);
-  };
+  }, [favorites]);
 
-  const clearFavorites = () => {
+  const clearFavorites = useCallback(() => {
     setFavorites(new Set());
     try {
       localStorage.removeItem(FAVORITES_KEY);
     } catch (error) {
       console.error('Error clearing favorites from localStorage:', error);
     }
-  };
+  }, []);
 
-  return {
+  // Memoize API object to keep reference stable unless dependencies change
+  return useMemo(() => ({
     favorites: Array.from(favorites),
     toggleFavorite,
     isFavorite,
     clearFavorites,
-  };
+  }), [favorites, toggleFavorite, isFavorite, clearFavorites]);
 };

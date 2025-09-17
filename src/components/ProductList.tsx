@@ -15,6 +15,7 @@ interface ProductListProps {
 }
 
 const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, onOpenDetail, categoriesById, isFavorite, onToggleFavorite }) => {
+  if (process.env.NODE_ENV !== 'production') console.count('ProductList render');
   const baseProducts = React.useMemo(() => {
     if (!filters?.favoritesOnly) return products;
     return products.filter((p) => isFavorite(p.id));
@@ -57,4 +58,4 @@ const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, on
   );
 };
 
-export default ProductList;
+export default React.memo(ProductList);

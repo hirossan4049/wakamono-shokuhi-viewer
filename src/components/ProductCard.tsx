@@ -23,6 +23,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, categories, isFavorite, onToggleFavorite }) => {
+  if (process.env.NODE_ENV !== 'production') console.count('ProductCard render');
   return (
     <Card
       shadow="sm"
@@ -94,4 +95,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, catego
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

@@ -24,6 +24,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   isFavorite,
   onToggleFavorite,
 }) => {
+  if (process.env.NODE_ENV !== 'production') console.count('ProductTable render');
   const baseProducts = React.useMemo(() => {
     if (!filters?.favoritesOnly) return products;
     return products.filter((p) => isFavorite(p.id));
@@ -127,4 +128,4 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
 };
 
-export default ProductTable;
+export default React.memo(ProductTable);
