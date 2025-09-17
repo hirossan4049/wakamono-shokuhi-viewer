@@ -1,30 +1,15 @@
-import React from 'react';
 import {
-  Group,
-  Select,
-  TextInput,
-  RangeSlider,
-  Stack,
-  Text,
-  Paper,
-  Button,
-  SegmentedControl,
-  Grid,
-  Title,
-  Loader,
+  Button, Grid, Group, Loader, Paper, RangeSlider, SegmentedControl, Select, Stack,
+  Text, TextInput, Title
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import {
-  IconSearch,
-  IconFilter,
-  IconFilterOff,
-  IconLayoutGrid,
-  IconTable,
-  IconSortAscending,
-  IconCategory,
-  IconHeart,
+  IconCategory, IconFilter,
+  IconFilterOff, IconHeart, IconLayoutGrid, IconSearch, IconSortAscending, IconTable
 } from '@tabler/icons-react';
+import React from 'react';
 import { FilterState, SortOption } from '../types/Product';
+import classes from './SliderLabel.module.css';
 
 interface FilterControlsProps {
   filters: FilterState;
@@ -247,10 +232,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             size="sm"
             disabled={disabled}
             labelAlwaysOn
-            marks={[
-              { value: priceRange[0], label: `${priceRange[0].toLocaleString()}円` },
-              { value: priceRange[1], label: `${priceRange[1].toLocaleString()}円` },
-            ]}
+            label={(value) => `${value.toLocaleString()}円`}
+            classNames={classes}
           />
         </div>
       </Stack>
