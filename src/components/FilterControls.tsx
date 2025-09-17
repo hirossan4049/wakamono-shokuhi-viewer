@@ -1,6 +1,6 @@
 import React from 'react';
-import { Group, Select, TextInput, RangeSlider, Stack, Text, Paper, Button } from '@mantine/core';
-import { IconSearch, IconFilter, IconFilterOff } from '@tabler/icons-react';
+import { Group, Select, TextInput, RangeSlider, Stack, Text, Paper, Button, SegmentedControl } from '@mantine/core';
+import { IconSearch, IconFilter, IconFilterOff, IconGrid3x3, IconTable } from '@tabler/icons-react';
 import { FilterState, SortOption } from '../types/Product';
 
 interface FilterControlsProps {
@@ -11,6 +11,8 @@ interface FilterControlsProps {
   categories: string[];
   priceRange: [number, number];
   onReset: () => void;
+  viewMode: 'grid' | 'table';
+  onViewModeChange: (mode: 'grid' | 'table') => void;
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -21,6 +23,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   categories,
   priceRange,
   onReset,
+  viewMode,
+  onViewModeChange,
 }) => {
   const sortOptions: SortOption[] = [
     { value: 'name_asc', label: '名前 (昇順)' },
@@ -65,14 +69,41 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             <IconFilter size={20} />
             <Text fw={500}>フィルタ・ソート</Text>
           </Group>
-          <Button
-            variant="light"
-            size="xs"
-            leftSection={<IconFilterOff size={16} />}
-            onClick={onReset}
-          >
-            リセット
-          </Button>
+          <Group gap="sm">
+            <SegmentedControl
+              value={viewMode}
+              onChange={(value) => onViewModeChange(value as 'grid' | 'table')}
+              data={[
+                {
+                  value: 'grid',
+                  label: (
+                    <Group gap={4}>
+                      <IconGrid3x3 size={16} />
+                      <Text size="sm">グリッド</Text>
+                    </Group>
+                  ),
+                },
+                {
+                  value: 'table',
+                  label: (
+                    <Group gap={4}>
+                      <IconTable size={16} />
+                      <Text size="sm">テーブル</Text>
+                    </Group>
+                  ),
+                },
+              ]}
+              size="sm"
+            />
+            <Button
+              variant="light"
+              size="xs"
+              leftSection={<IconFilterOff size={16} />}
+              onClick={onReset}
+            >
+              リセット
+            </Button>
+          </Group>
         </Group>
 
         <Group grow>

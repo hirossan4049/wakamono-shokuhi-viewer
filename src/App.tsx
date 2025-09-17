@@ -1,18 +1,26 @@
 import React, { useState, useMemo } from 'react';
 import { AppShell, Container, Title, Text, Stack, Group, Badge } from '@mantine/core';
-import { ProductData, FilterState } from './types/Product';
+import { ProductData, FilterState, Product } from './types/Product';
+import { useFavorites } from './hooks/useFavorites';
 import FileUpload from './components/FileUpload';
 import FilterControls from './components/FilterControls';
 import ProductList from './components/ProductList';
+import ProductTable from './components/ProductTable';
+import ProductDetailModal from './components/ProductDetailModal';
 
 function App() {
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [sortBy, setSortBy] = useState<string>('name_asc');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [detailModalOpened, setDetailModalOpened] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     category: '',
     priceRange: [0, 1000000],
     searchText: '',
   });
+
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Calculate available categories and price range from data
   const { categories, priceRange } = useMemo(() => {
@@ -52,6 +60,16 @@ function App() {
       searchText: '',
     });
     setSortBy('name_asc');
+  };
+
+  const handleOpenDetail = (product: Product) => {
+    setSelectedProduct(product);
+    setDetailModalOpened(true);
+  };
+
+  const handleCloseDetail = () => {
+    setDetailModalOpened(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -99,17 +117,41 @@ function App() {
                   categories={categories}
                   priceRange={priceRange}
                   onReset={handleResetFilters}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
                 />
-                <ProductList
-                  products={productData.products}
-                  filters={filters}
-                  sortBy={sortBy}
-                />
+                {viewMode === 'grid' ? (
+                  <ProductList
+                    products={productData.products}
+                    filters={filters}
+                    sortBy={sortBy}
+                    onOpenDetail={handleOpenDetail}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                ) : (
+                  <ProductTable
+                    products={productData.products}
+                    filters={filters}
+                    sortBy={sortBy}
+                    onOpenDetail={handleOpenDetail}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                )}
               </>
             )}
           </Stack>
         </Container>
       </AppShell.Main>
+
+      <ProductDetailModal
+        product={selectedProduct}
+        opened={detailModalOpened}
+        onClose={handleCloseDetail}
+        isFavorite={selectedProduct ? isFavorite(selectedProduct.id) : false}
+        onToggleFavorite={toggleFavorite}
+      />
     </AppShell>
   );
 }
