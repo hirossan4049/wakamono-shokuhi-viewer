@@ -1,0 +1,118 @@
+{
+  "products": [
+    {
+      "name": "海鮮ごはんの素のどぐろめし　8セット",
+      "id": "WA-482",
+      "category": "石川県産品",
+      "thumb": "sample.jpg",
+      "images": [
+        "sample1.jpg",
+        "sample2.jpg"
+      ],
+      "detail": "石川県の名産のどぐろを使用した高級海鮮ごはんの素です。8セット入りでご家族でお楽しみいただけます。",
+      "detail_url": "https://example.com/wa-482",
+      "totals": 6912,
+      "items": [
+        {
+          "name": "海鮮ごはん のどぐろめし 180g",
+          "price": 864,
+          "amount": 8,
+          "url": "https://example.com/product/nodoguro"
+        }
+      ]
+    },
+    {
+      "name": "能登牛ステーキセット",
+      "id": "WA-485",
+      "category": "石川県産品",
+      "thumb": "steak.jpg",
+      "images": [
+        "steak1.jpg"
+      ],
+      "detail": "能登半島で育てられた上質な能登牛のステーキセットです。",
+      "detail_url": "https://example.com/wa-485",
+      "totals": 15000,
+      "items": [
+        {
+          "name": "能登牛サーロインステーキ 200g",
+          "price": 7500,
+          "amount": 2,
+          "url": "https://example.com/product/noto-beef"
+        }
+      ]
+    },
+    {
+      "name": "加賀野菜セット",
+      "id": "WA-490",
+      "category": "野菜・農産物",
+      "thumb": "vegetables.jpg",
+      "images": [
+        "veg1.jpg",
+        "veg2.jpg"
+      ],
+      "detail": "金沢の伝統野菜である加賀野菜の詰め合わせセットです。季節の野菜をお楽しみください。",
+      "detail_url": "https://example.com/wa-490",
+      "totals": 3500,
+      "items": [
+        {
+          "name": "加賀れんこん 500g",
+          "price": 800,
+          "amount": 2,
+          "url": "https://example.com/product/kaga-renkon"
+        },
+        {
+          "name": "金時草 100g",
+          "price": 450,
+          "amount": 3,
+          "url": "https://example.com/product/kinjiso"
+        },
+        {
+          "name": "加賀太きゅうり 2本",
+          "price": 650,
+          "amount": 1,
+          "url": "https://example.com/product/kaga-kyuri"
+        }
+      ]
+    },
+    {
+      "name": "富山湾白えび煎餅",
+      "id": "WA-495",
+      "category": "富山県産品",
+      "thumb": "senbei.jpg",
+      "images": [
+        "senbei1.jpg"
+      ],
+      "detail": "富山湾で獲れた白えびを使用した香ばしい煎餅です。",
+      "detail_url": "https://example.com/wa-495",
+      "totals": 1200,
+      "items": [
+        {
+          "name": "白えび煎餅 12枚入り",
+          "price": 1200,
+          "amount": 1,
+          "url": "https://example.com/product/shiroebi-senbei"
+        }
+      ]
+    },
+    {
+      "name": "福井県産コシヒカリ",
+      "id": "WA-500",
+      "category": "米・穀類",
+      "thumb": "rice.jpg",
+      "images": [
+        "rice1.jpg"
+      ],
+      "detail": "福井県産の美味しいコシヒカリです。10kg入りでたっぷりお楽しみいただけます。",
+      "detail_url": "https://example.com/wa-500",
+      "totals": 4800,
+      "items": [
+        {
+          "name": "コシヒカリ 5kg",
+          "price": 2400,
+          "amount": 2,
+          "url": "https://example.com/product/koshihikari"
+        }
+      ]
+    }
+  ]
+}
