@@ -26,6 +26,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   isFavorite: boolean;
   onToggleFavorite: (productId: string) => void;
+  categories: string[];
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -34,6 +35,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   isFavorite,
   onToggleFavorite,
+  categories,
 }) => {
   if (!product) return null;
 
@@ -71,9 +73,13 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {/* Product Info */}
         <Group justify="space-between" align="flex-start">
           <Stack gap="xs" style={{ flex: 1 }}>
-            <Badge size="lg" variant="light">
-              {product.category}
-            </Badge>
+            <Group gap={6} wrap="wrap">
+              {(categories && categories.length > 0 ? categories : [product.category]).map((cat) => (
+                <Badge key={cat} size="lg" variant="light">
+                  {cat}
+                </Badge>
+              ))}
+            </Group>
             <Text c="dimmed">ID: {product.id}</Text>
           </Stack>
           <Group>

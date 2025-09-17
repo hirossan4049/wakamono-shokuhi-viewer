@@ -47,6 +47,21 @@ function App() {
     };
   }, [productData]);
 
+  // Map product ID => all categories it appears in
+  const categoriesById = useMemo<Record<string, string[]>>(() => {
+    const map: Record<string, Set<string>> = {};
+    if (!productData?.products) return {};
+    for (const p of productData.products) {
+      if (!map[p.id]) map[p.id] = new Set<string>();
+      if (p.category) map[p.id].add(p.category);
+    }
+    const out: Record<string, string[]> = {};
+    for (const [id, set] of Object.entries(map)) {
+      out[id] = Array.from(set).sort();
+    }
+    return out;
+  }, [productData]);
+
   // Update filters when data changes
   React.useEffect(() => {
     if (productData && priceRange) {
@@ -175,6 +190,7 @@ function App() {
                       filters={filters}
                       sortBy={sortBy}
                       onOpenDetail={handleOpenDetail}
+                      categoriesById={categoriesById}
                       isFavorite={isFavorite}
                       onToggleFavorite={toggleFavorite}
                     />
@@ -184,6 +200,7 @@ function App() {
                       filters={filters}
                       sortBy={sortBy}
                       onOpenDetail={handleOpenDetail}
+                      categoriesById={categoriesById}
                       isFavorite={isFavorite}
                       onToggleFavorite={toggleFavorite}
                     />
@@ -200,6 +217,7 @@ function App() {
           onClose={handleCloseDetail}
           isFavorite={selectedProduct ? isFavorite(selectedProduct.id) : false}
           onToggleFavorite={toggleFavorite}
+          categories={selectedProduct ? categoriesById[selectedProduct.id] || (selectedProduct.category ? [selectedProduct.category] : []) : []}
         />
       </AppShell>
     </MantineProvider>

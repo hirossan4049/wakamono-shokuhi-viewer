@@ -10,6 +10,7 @@ interface ProductTableProps {
   filters: FilterState;
   sortBy: string;
   onOpenDetail: (product: Product) => void;
+  categoriesById: Record<string, string[]>;
   isFavorite: (productId: string) => boolean;
   onToggleFavorite: (productId: string) => void;
 }
@@ -19,6 +20,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   filters,
   sortBy,
   onOpenDetail,
+  categoriesById,
   isFavorite,
   onToggleFavorite,
 }) => {
@@ -47,9 +49,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </Group>
       </Table.Td>
       <Table.Td>
-        <Badge variant="light">
-          {product.category}
-        </Badge>
+        <Group gap={6} wrap="wrap">
+          {(categoriesById[product.id] || (product.category ? [product.category] : [])).map((cat) => (
+            <Badge key={cat} variant="light">
+              {cat}
+            </Badge>
+          ))}
+        </Group>
       </Table.Td>
       <Table.Td>
         <Text fw={500}>

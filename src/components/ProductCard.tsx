@@ -17,11 +17,12 @@ import classes from './ProductCard.module.css';
 interface ProductCardProps {
   product: Product;
   onOpenDetail: (product: Product) => void;
+  categories: string[];
   isFavorite: boolean;
   onToggleFavorite: (productId: string) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, isFavorite, onToggleFavorite }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, categories, isFavorite, onToggleFavorite }) => {
   return (
     <Card
       shadow="sm"
@@ -59,9 +60,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, isFavo
         <Text fw={700} size="lg" lineClamp={1}>
           {product.name}
         </Text>
-        <Badge color="blue" variant="light">
-          {product.category}
-        </Badge>
+        <Group gap={6} wrap="wrap">
+          {(categories && categories.length > 0 ? categories : [product.category]).map((cat) => (
+            <Badge key={cat} color="blue" variant="light">
+              {cat}
+            </Badge>
+          ))}
+        </Group>
         <Text size="sm" c="dimmed" lineClamp={2} h={40}>
           {product.detail}
         </Text>

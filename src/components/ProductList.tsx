@@ -9,11 +9,12 @@ interface ProductListProps {
   filters: FilterState;
   sortBy: string;
   onOpenDetail: (product: Product) => void;
+  categoriesById: Record<string, string[]>;
   isFavorite: (productId: string) => boolean;
   onToggleFavorite: (productId: string) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, onOpenDetail, isFavorite, onToggleFavorite }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, onOpenDetail, categoriesById, isFavorite, onToggleFavorite }) => {
   const filteredAndSortedProducts = useFilteredProducts(products, filters, sortBy);
 
   if (filteredAndSortedProducts.length === 0) {
@@ -42,6 +43,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, on
           key={product.id} 
           product={product} 
           onOpenDetail={onOpenDetail}
+          categories={categoriesById[product.id] || (product.category ? [product.category] : [])}
           isFavorite={isFavorite(product.id)}
           onToggleFavorite={onToggleFavorite}
         />
