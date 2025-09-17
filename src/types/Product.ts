@@ -30,4 +30,5 @@ export interface FilterState {
   category: string;
   priceRange: [number, number];
   searchText: string;
+  favoritesOnly?: boolean;
 }

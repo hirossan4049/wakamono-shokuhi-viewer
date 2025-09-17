@@ -15,7 +15,12 @@ interface ProductListProps {
 }
 
 const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, onOpenDetail, categoriesById, isFavorite, onToggleFavorite }) => {
-  const filteredAndSortedProducts = useFilteredProducts(products, filters, sortBy);
+  const baseProducts = React.useMemo(() => {
+    if (!filters?.favoritesOnly) return products;
+    return products.filter((p) => isFavorite(p.id));
+  }, [products, filters?.favoritesOnly, isFavorite]);
+
+  const filteredAndSortedProducts = useFilteredProducts(baseProducts, filters, sortBy);
 
   if (filteredAndSortedProducts.length === 0) {
     return (

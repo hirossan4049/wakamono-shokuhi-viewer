@@ -22,6 +22,7 @@ function App() {
     category: '',
     priceRange: [0, 1000000],
     searchText: '',
+    favoritesOnly: false,
   });
   const [, startTransition] = useTransition();
 
@@ -116,6 +117,7 @@ function App() {
       category: '',
       priceRange: priceRange,
       searchText: '',
+      favoritesOnly: false,
     });
     setSortBy('name_asc');
   };

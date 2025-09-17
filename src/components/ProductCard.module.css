@@ -1,5 +1,6 @@
 .card {
   transition: transform 150ms ease, box-shadow 150ms ease;
+  cursor: pointer;
 
   &:hover {
     transform: scale(1.02);
@@ -22,7 +23,7 @@
 
 .favoriteButton {
   position: absolute;
-  top: var(--mantine-spacing-md);
-  right: var(--mantine-spacing-md);
+  top: var(--mantine-spacing-sm);
+  right: var(--mantine-spacing-sm);
   z-index: 1;
 }

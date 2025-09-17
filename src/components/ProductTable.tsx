@@ -24,7 +24,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
   isFavorite,
   onToggleFavorite,
 }) => {
-  const filteredAndSortedProducts = useFilteredProducts(products, filters, sortBy);
+  const baseProducts = React.useMemo(() => {
+    if (!filters?.favoritesOnly) return products;
+    return products.filter((p) => isFavorite(p.id));
+  }, [products, filters?.favoritesOnly, isFavorite]);
+
+  const filteredAndSortedProducts = useFilteredProducts(baseProducts, filters, sortBy);
 
   const rows = filteredAndSortedProducts.map((product) => (
     <Table.Tr key={product.id} onClick={() => onOpenDetail(product)} className={classes.row}>

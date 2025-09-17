@@ -22,6 +22,7 @@ import {
   IconTable,
   IconSortAscending,
   IconCategory,
+  IconHeart,
 } from '@tabler/icons-react';
 import { FilterState, SortOption } from '../types/Product';
 
@@ -142,6 +143,21 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           </Group>
           <Group gap="sm">
             {isBusy && <Loader size="xs" />}
+            <Button
+              variant={filters.favoritesOnly ? 'filled' : 'light'}
+              color="red"
+              onClick={() =>
+                withApply(() =>
+                  onFiltersChange({
+                    ...filters,
+                    favoritesOnly: !filters.favoritesOnly,
+                  })
+                )
+              }
+              leftSection={<IconHeart size={16} />}
+            >
+              {filters.favoritesOnly ? 'お気に入りのみ: ON' : 'お気に入りのみ'}
+            </Button>
             <SegmentedControl
               value={viewMode}
               onChange={(value) => onViewModeChange(value as 'grid' | 'table')}
