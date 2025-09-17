@@ -7,9 +7,12 @@ interface ProductListProps {
   products: Product[];
   filters: FilterState;
   sortBy: string;
+  onOpenDetail: (product: Product) => void;
+  isFavorite: (productId: string) => boolean;
+  onToggleFavorite: (productId: string) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy, onOpenDetail, isFavorite, onToggleFavorite }) => {
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products;
 
@@ -80,7 +83,13 @@ const ProductList: React.FC<ProductListProps> = ({ products, filters, sortBy }) 
       verticalSpacing="md"
     >
       {filteredAndSortedProducts.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard 
+          key={product.id} 
+          product={product} 
+          onOpenDetail={onOpenDetail}
+          isFavorite={isFavorite(product.id)}
+          onToggleFavorite={onToggleFavorite}
+        />
       ))}
     </SimpleGrid>
   );
