@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useTransition } from 'react';
 import { MantineProvider, AppShell, Container, Title, Text, Stack, Group, Badge } from '@mantine/core';
 import { ProductData, FilterState, Product } from './types/Product';
 import { useFavorites } from './hooks/useFavorites';
@@ -10,7 +10,6 @@ import ProductDetailModal from './components/ProductDetailModal';
 import { theme } from './theme';
 import { IconReceipt2 } from '@tabler/icons-react';
 import { Notifications, notifications } from '@mantine/notifications';
-import { useDebounce } from 'use-debounce';
 import { saveProductDataToDB, getCountsFromDB, loadProductDataFromDB } from './utils/indexedDB';
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
     priceRange: [0, 1000000],
     searchText: '',
   });
-  const [filters] = useDebounce(filterState, 300);
+  const [, startTransition] = useTransition();
 
   const { isFavorite, toggleFavorite } = useFavorites();
 
@@ -175,19 +174,20 @@ function App() {
                 <>
                   <FilterControls
                     filters={filterState}
-                    onFiltersChange={setFilterState}
+                    onFiltersChange={(next) => startTransition(() => setFilterState(next))}
                     sortBy={sortBy}
-                    onSortChange={setSortBy}
+                    onSortChange={(next) => startTransition(() => setSortBy(next))}
                     categories={categories}
                     priceRange={priceRange}
-                    onReset={handleResetFilters}
+                    onReset={() => startTransition(() => handleResetFilters())}
                     viewMode={viewMode}
-                    onViewModeChange={setViewMode}
+                    onViewModeChange={(mode) => startTransition(() => setViewMode(mode))}
+                    disabled={!productData}
                   />
                   {viewMode === 'grid' ? (
                     <ProductList
                       products={productData.products}
-                      filters={filters}
+                      filters={filterState}
                       sortBy={sortBy}
                       onOpenDetail={handleOpenDetail}
                       categoriesById={categoriesById}
@@ -197,7 +197,7 @@ function App() {
                   ) : (
                     <ProductTable
                       products={productData.products}
-                      filters={filters}
+                      filters={filterState}
                       sortBy={sortBy}
                       onOpenDetail={handleOpenDetail}
                       categoriesById={categoriesById}

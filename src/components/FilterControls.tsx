@@ -11,7 +11,9 @@ import {
   SegmentedControl,
   Grid,
   Title,
+  Loader,
 } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import {
   IconSearch,
   IconFilter,
@@ -25,14 +27,16 @@ import { FilterState, SortOption } from '../types/Product';
 
 interface FilterControlsProps {
   filters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
+  onFiltersChange: (filters: FilterState) => void | Promise<void>;
   sortBy: string;
-  onSortChange: (sort: string) => void;
+  onSortChange: (sort: string) => void | Promise<void>;
   categories: string[];
   priceRange: [number, number];
   onReset: () => void;
   viewMode: 'grid' | 'table';
   onViewModeChange: (mode: 'grid' | 'table') => void;
+  loading?: boolean;
+  disabled?: boolean;
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
@@ -45,7 +49,22 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   onReset,
   viewMode,
   onViewModeChange,
+  loading,
+  disabled,
 }) => {
+  const [applying, setApplying] = React.useState(false);
+  const [searchDraft, setSearchDraft] = React.useState(filters.searchText);
+  const [priceDraft, setPriceDraft] = React.useState<[number, number]>(filters.priceRange);
+  const [debouncedSearch] = useDebouncedValue(searchDraft, 300);
+
+  // keep local drafts in sync when outer filters change
+  React.useEffect(() => {
+    setSearchDraft(filters.searchText);
+  }, [filters.searchText]);
+  React.useEffect(() => {
+    setPriceDraft(filters.priceRange);
+  }, [filters.priceRange]);
+
   const sortOptions: SortOption[] = [
     { value: 'name_asc', label: '名前 (昇順)' },
     { value: 'name_desc', label: '名前 (降順)' },
@@ -60,26 +79,56 @@ const FilterControls: React.FC<FilterControlsProps> = ({
     ...categories.map((cat) => ({ value: cat, label: cat })),
   ];
 
+  const withApply = async (fn: () => void | Promise<void>) => {
+    const ret = fn();
+    const isPromise = ret && typeof (ret as any).then === 'function';
+    if (!isPromise) return;
+    try {
+      setApplying(true);
+      await (ret as Promise<void>);
+    } finally {
+      setApplying(false);
+    }
+  };
+
   const handlePriceRangeChange = (value: [number, number]) => {
-    onFiltersChange({
-      ...filters,
-      priceRange: value,
-    });
+    setPriceDraft(value);
+  };
+  const handlePriceRangeChangeEnd = (value: [number, number]) => {
+    withApply(() =>
+      onFiltersChange({
+        ...filters,
+        priceRange: value,
+      })
+    );
   };
 
   const handleCategoryChange = (value: string | null) => {
-    onFiltersChange({
-      ...filters,
-      category: value || '',
-    });
+    withApply(() =>
+      onFiltersChange({
+        ...filters,
+        category: value || '',
+      })
+    );
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onFiltersChange({
-      ...filters,
-      searchText: event.target.value,
-    });
+    const value = event.target.value;
+    setSearchDraft(value);
   };
+
+  // Debounced apply for search text (non-blocking)
+  React.useEffect(() => {
+    if (debouncedSearch === filters.searchText) return;
+    withApply(() =>
+      onFiltersChange({
+        ...filters,
+        searchText: debouncedSearch,
+      })
+    );
+  }, [debouncedSearch, filters, onFiltersChange]);
+
+  const isBusy = applying;
 
   return (
     <Paper p="lg" shadow="sm" radius="md" withBorder>
@@ -92,6 +141,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             </Title>
           </Group>
           <Group gap="sm">
+            {isBusy && <Loader size="xs" />}
             <SegmentedControl
               value={viewMode}
               onChange={(value) => onViewModeChange(value as 'grid' | 'table')}
@@ -115,11 +165,14 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   ),
                 },
               ]}
+              size="sm"
+              disabled={disabled}
             />
             <Button
               variant="light"
               leftSection={<IconFilterOff size={16} />}
               onClick={onReset}
+              disabled={disabled}
             >
               リセット
             </Button>
@@ -129,42 +182,55 @@ const FilterControls: React.FC<FilterControlsProps> = ({
         <Grid gutter="md">
           <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
             <TextInput
+              label="検索"
               placeholder="商品名、IDなどで検索..."
-              value={filters.searchText}
+              value={searchDraft}
               onChange={handleSearchChange}
               leftSection={<IconSearch size={16} />}
+              size="sm"
+              disabled={disabled}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
             <Select
-              placeholder="ソート順"
+              label="ソート順"
               data={sortOptions}
               value={sortBy}
-              onChange={(value) => onSortChange(value || 'name_asc')}
+              onChange={(value) => withApply(() => onSortChange(value || 'name_asc'))}
               leftSection={<IconSortAscending size={16} />}
+              size="sm"
+              clearable={false}
+              disabled={disabled}
             />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
             <Select
-              placeholder="カテゴリ"
+              label="カテゴリ"
               data={categoryOptions}
               value={filters.category}
               onChange={handleCategoryChange}
               leftSection={<IconCategory size={16} />}
+              size="sm"
+              clearable
+              disabled={disabled}
             />
           </Grid.Col>
         </Grid>
 
         <div>
           <Text size="sm" mb="xs">
-            価格範囲: {filters.priceRange[0].toLocaleString()}円 - {filters.priceRange[1].toLocaleString()}円
+            価格範囲: {priceDraft[0].toLocaleString()}円 - {priceDraft[1].toLocaleString()}円
           </Text>
           <RangeSlider
             min={priceRange[0]}
             max={priceRange[1]}
-            value={filters.priceRange}
+            value={priceDraft}
             onChange={handlePriceRangeChange}
+            onChangeEnd={handlePriceRangeChangeEnd}
             step={100}
+            size="sm"
+            disabled={disabled}
+            labelAlwaysOn
             marks={[
               { value: priceRange[0], label: `${priceRange[0].toLocaleString()}円` },
               { value: priceRange[1], label: `${priceRange[1].toLocaleString()}円` },
