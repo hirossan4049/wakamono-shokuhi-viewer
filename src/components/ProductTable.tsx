@@ -1,8 +1,8 @@
+import { ActionIcon, Badge, Group, Image, NumberFormatter, Stack, Table, Text } from '@mantine/core';
+import { IconExternalLink, IconEye, IconHeart, IconHeartFilled } from '@tabler/icons-react';
 import React from 'react';
-import { Table, Text, Badge, Group, ActionIcon, Anchor, Image, Stack, NumberFormatter } from '@mantine/core';
-import { IconHeart, IconHeartFilled, IconExternalLink, IconEye } from '@tabler/icons-react';
-import { Product, FilterState } from '../types/Product';
 import { useFilteredProducts } from '../hooks/useFilteredProducts';
+import { FilterState, Product } from '../types/Product';
 import classes from './ProductTable.module.css';
 
 interface ProductTableProps {
@@ -117,7 +117,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
           <Table.Tr>
             <Table.Th>商品名</Table.Th>
             <Table.Th>カテゴリ</Table.Th>
-            <Table.Th>価格</Table.Th>
+            <Table.Th>参考価格</Table.Th>
             <Table.Th>商品数</Table.Th>
             <Table.Th>アクション</Table.Th>
           </Table.Tr>

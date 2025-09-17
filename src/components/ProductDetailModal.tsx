@@ -1,24 +1,11 @@
-import React from 'react';
-import { 
-  Modal, 
-  Text, 
-  Group, 
-  Stack, 
-  Badge, 
-  Divider, 
-  NumberFormatter, 
-  Image, 
-  Anchor,
-  ActionIcon,
-  ScrollArea,
-  Title,
-  Paper,
-  Button
-} from '@mantine/core';
-import { IconHeart, IconHeartFilled, IconExternalLink } from '@tabler/icons-react';
-import { Product } from '../types/Product';
 import { Carousel } from '@mantine/carousel';
 import '@mantine/carousel/styles.css';
+import {
+  ActionIcon, Anchor, Badge, Button, Divider, Group, Image, Modal, NumberFormatter, Paper, ScrollArea, Stack, Text, Title
+} from '@mantine/core';
+import { IconExternalLink, IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import React from 'react';
+import { Product } from '../types/Product';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -85,11 +72,11 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </Stack>
           <Group>
             {product.detail_url && (
-              <Button 
-                component="a" 
-                href={product.detail_url} 
-                target="_blank" 
-                variant="outline" 
+              <Button
+                component="a"
+                href={product.detail_url}
+                target="_blank"
+                variant="outline"
                 leftSection={<IconExternalLink size={16} />}
               >
                 詳細ページ
@@ -123,7 +110,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         {/* Price Information */}
         <Paper withBorder p="md" radius="md">
           <Group justify="space-between">
-            <Title order={4} size="h4">価格情報</Title>
+            <Title order={4} size="h4">参考価格</Title>
             <Stack gap={0} align="flex-end">
               <Text size="sm" c="dimmed">総額</Text>
               <Text size="xl" fw={700}>
@@ -161,7 +148,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </Stack>
 
         <Divider />
-        
+
         <Group justify="space-between">
           <Text c="dimmed">
             計算合計:

@@ -1,4 +1,4 @@
-# 若者食費ビューアー (Wakamono Shokuhi Viewer)
+# 大阪府若者食費支援検索 (Wakamono Shokuhi Viewer)
 
 ## 概要
 商品データをJSONファイルから読み込み、一覧表示・検索・フィルタリング・ソートができるReactアプリケーションです。GitHub Pagesで公開されており、Mantine UIを使用した美しいUIデザインが特徴です。

@@ -1,16 +1,13 @@
-import React, { useState, useMemo, useTransition, useCallback } from 'react';
-import { AppShell, Container, Title, Text, Stack, Group, Badge } from '@mantine/core';
-import { ProductData, FilterState, Product } from './types/Product';
-import { useFavorites } from './hooks/useFavorites';
-import FileUpload from './components/FileUpload';
-import FilterControls from './components/FilterControls';
-import ProductList from './components/ProductList';
-import ProductTable from './components/ProductTable';
-import ProductDetailModal from './components/ProductDetailModal';
-import MainContent from './components/MainContent';
-import { IconReceipt2 } from '@tabler/icons-react';
+import { AppShell, Badge, Container, Group, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { saveProductDataToDB, getCountsFromDB, loadProductDataFromDB } from './utils/indexedDB';
+import { IconReceipt2 } from '@tabler/icons-react';
+import React, { useCallback, useMemo, useState, useTransition } from 'react';
+import FileUpload from './components/FileUpload';
+import MainContent from './components/MainContent';
+import ProductDetailModal from './components/ProductDetailModal';
+import { useFavorites } from './hooks/useFavorites';
+import { FilterState, Product, ProductData } from './types/Product';
+import { getCountsFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
 
 function App() {
   if (process.env.NODE_ENV !== 'production') console.count('App render');
@@ -170,59 +167,59 @@ function App() {
   }, [productData, filterState, sortBy, categories, priceRange, viewMode, handleFiltersChange, handleSortChange, handleResetFilters, handleViewModeChange, handleOpenDetail, categoriesById, isFavorite, toggleFavorite]);
 
   return (
-      <AppShell
-        header={{ height: 80 }}
-        padding="md"
-      >
-        <AppShell.Header>
-          <Container size="xl" h="100%">
-            <Group h="100%" justify="space-between" align="center">
-              <Group>
-                <IconReceipt2 size={32} />
-                <div>
-                  <Title order={1} size="h2">
-                    若者食費ビューアー
-                  </Title>
-                  <Text size="sm" c="dimmed">
-                    商品データの表示・検索・フィルタリング
-                  </Text>
-                </div>
-              </Group>
-              {productData && (
-                <Badge size="lg" variant="light">
-                  {productData.products.length}件の商品
-                </Badge>
-              )}
+    <AppShell
+      header={{ height: 80 }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Container size="xl" h="100%">
+          <Group h="100%" justify="space-between" align="center">
+            <Group>
+              <IconReceipt2 size={32} />
+              <div>
+                <Title order={1} size="h2">
+                  大阪府若者食費支援検索
+                </Title>
+                <Text size="sm" c="dimmed">
+                  商品データの表示・検索・フィルタリング
+                </Text>
+              </div>
             </Group>
+            {productData && (
+              <Badge size="lg" variant="light">
+                {productData.products.length}件の商品
+              </Badge>
+            )}
+          </Group>
+        </Container>
+      </AppShell.Header>
+
+      <AppShell.Main>
+        {!productData ? (
+          <Container size="xl">
+            <Stack gap="lg">
+              <div>
+                <Title order={2} mb="md">
+                  JSONファイルをアップロード
+                </Title>
+                <FileUpload onFileLoad={handleFileLoad} />
+              </div>
+            </Stack>
           </Container>
-        </AppShell.Header>
+        ) : (
+          mainContent
+        )}
+      </AppShell.Main>
 
-        <AppShell.Main>
-          {!productData ? (
-            <Container size="xl">
-              <Stack gap="lg">
-                <div>
-                  <Title order={2} mb="md">
-                    JSONファイルをアップロード
-                  </Title>
-                  <FileUpload onFileLoad={handleFileLoad} />
-                </div>
-              </Stack>
-            </Container>
-          ) : (
-            mainContent
-          )}
-        </AppShell.Main>
-
-        <ProductDetailModal
-          product={selectedProduct}
-          opened={detailModalOpened}
-          onClose={handleCloseDetail}
-          isFavorite={selectedProduct ? isFavorite(selectedProduct.id) : false}
-          onToggleFavorite={toggleFavorite}
-          categories={selectedProduct ? categoriesById[selectedProduct.id] || (selectedProduct.category ? [selectedProduct.category] : []) : []}
-        />
-      </AppShell>
+      <ProductDetailModal
+        product={selectedProduct}
+        opened={detailModalOpened}
+        onClose={handleCloseDetail}
+        isFavorite={selectedProduct ? isFavorite(selectedProduct.id) : false}
+        onToggleFavorite={toggleFavorite}
+        categories={selectedProduct ? categoriesById[selectedProduct.id] || (selectedProduct.category ? [selectedProduct.category] : []) : []}
+      />
+    </AppShell>
   );
 }
 
