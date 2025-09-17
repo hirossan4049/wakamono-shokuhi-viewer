@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { IconUpload, IconX, IconFile } from '@tabler/icons-react';
-import { Text, Group, rem } from '@mantine/core';
+import { Text, Group, rem, Title, Paper } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { ProductData } from '../types/Product';
 
@@ -54,42 +54,47 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoad }) => {
   };
 
   return (
-    <Dropzone
-      onDrop={handleFileDrop}
-      accept={{ 'application/json': ['.json'] }}
-      maxFiles={1}
-      multiple={false}
-    >
-      <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
-        <Dropzone.Accept>
-          <IconUpload
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
-            stroke={1.5}
-          />
-        </Dropzone.Accept>
-        <Dropzone.Reject>
-          <IconX
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
-            stroke={1.5}
-          />
-        </Dropzone.Reject>
-        <Dropzone.Idle>
-          <IconFile
-            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
-            stroke={1.5}
-          />
-        </Dropzone.Idle>
+    <Paper withBorder p="xl" radius="md">
+      <Title order={2} size="h3" mb="lg" ta="center">
+        データをアップロード
+      </Title>
+      <Dropzone
+        onDrop={handleFileDrop}
+        accept={{ 'application/json': ['.json'] }}
+        maxFiles={1}
+        multiple={false}
+      >
+        <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
+          <Dropzone.Accept>
+            <IconUpload
+              style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-myColor-6)' }}
+              stroke={1.5}
+            />
+          </Dropzone.Accept>
+          <Dropzone.Reject>
+            <IconX
+              style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
+              stroke={1.5}
+            />
+          </Dropzone.Reject>
+          <Dropzone.Idle>
+            <IconFile
+              style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
+              stroke={1.5}
+            />
+          </Dropzone.Idle>
 
-        <div>
-          <Text size="xl" inline>
-            JSONファイルをドラッグ&ドロップ
-          </Text>
-          <Text size="sm" c="dimmed" inline mt={7}>
-            商品データの入ったJSONファイルをアップロードしてください
-          </Text>
-        </div>
-      </Group>
-    </Dropzone>
+          <div>
+            <Text size="xl" inline>
+              ここにJSONファイルをドラッグ
+            </Text>
+            <Text size="sm" c="dimmed" inline mt={7}>
+              またはクリックしてファイルを選択
+            </Text>
+          </div>
+        </Group>
+      </Dropzone>
+    </Paper>
   );
 };
 

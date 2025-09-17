@@ -1,6 +1,26 @@
 import React from 'react';
-import { Group, Select, TextInput, RangeSlider, Stack, Text, Paper, Button, SegmentedControl } from '@mantine/core';
-import { IconSearch, IconFilter, IconFilterOff, IconGrid3x3, IconTable } from '@tabler/icons-react';
+import {
+  Group,
+  Select,
+  TextInput,
+  RangeSlider,
+  Stack,
+  Text,
+  Paper,
+  Button,
+  SegmentedControl,
+  Grid,
+  Title,
+} from '@mantine/core';
+import {
+  IconSearch,
+  IconFilter,
+  IconFilterOff,
+  IconLayoutGrid,
+  IconTable,
+  IconSortAscending,
+  IconCategory,
+} from '@tabler/icons-react';
 import { FilterState, SortOption } from '../types/Product';
 
 interface FilterControlsProps {
@@ -37,7 +57,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
 
   const categoryOptions = [
     { value: '', label: 'すべてのカテゴリ' },
-    ...categories.map(cat => ({ value: cat, label: cat }))
+    ...categories.map((cat) => ({ value: cat, label: cat })),
   ];
 
   const handlePriceRangeChange = (value: [number, number]) => {
@@ -62,12 +82,14 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   };
 
   return (
-    <Paper p="md" shadow="sm" radius="md" withBorder>
-      <Stack gap="md">
+    <Paper p="lg" shadow="sm" radius="md" withBorder>
+      <Stack gap="lg">
         <Group justify="space-between" align="center">
           <Group gap="xs">
-            <IconFilter size={20} />
-            <Text fw={500}>フィルタ・ソート</Text>
+            <IconFilter size={24} />
+            <Title order={2} size="h3">
+              フィルタ & ソート
+            </Title>
           </Group>
           <Group gap="sm">
             <SegmentedControl
@@ -78,7 +100,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   value: 'grid',
                   label: (
                     <Group gap={4}>
-                      <IconGrid3x3 size={16} />
+                      <IconLayoutGrid size={16} />
                       <Text size="sm">グリッド</Text>
                     </Group>
                   ),
@@ -93,11 +115,9 @@ const FilterControls: React.FC<FilterControlsProps> = ({
                   ),
                 },
               ]}
-              size="sm"
             />
             <Button
               variant="light"
-              size="xs"
               leftSection={<IconFilterOff size={16} />}
               onClick={onReset}
             >
@@ -106,26 +126,34 @@ const FilterControls: React.FC<FilterControlsProps> = ({
           </Group>
         </Group>
 
-        <Group grow>
-          <TextInput
-            placeholder="商品名で検索..."
-            value={filters.searchText}
-            onChange={handleSearchChange}
-            leftSection={<IconSearch size={16} />}
-          />
-          <Select
-            placeholder="ソート順"
-            data={sortOptions}
-            value={sortBy}
-            onChange={(value) => onSortChange(value || 'name_asc')}
-          />
-          <Select
-            placeholder="カテゴリ"
-            data={categoryOptions}
-            value={filters.category}
-            onChange={handleCategoryChange}
-          />
-        </Group>
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+            <TextInput
+              placeholder="商品名、IDなどで検索..."
+              value={filters.searchText}
+              onChange={handleSearchChange}
+              leftSection={<IconSearch size={16} />}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+            <Select
+              placeholder="ソート順"
+              data={sortOptions}
+              value={sortBy}
+              onChange={(value) => onSortChange(value || 'name_asc')}
+              leftSection={<IconSortAscending size={16} />}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6, lg: 3 }}>
+            <Select
+              placeholder="カテゴリ"
+              data={categoryOptions}
+              value={filters.category}
+              onChange={handleCategoryChange}
+              leftSection={<IconCategory size={16} />}
+            />
+          </Grid.Col>
+        </Grid>
 
         <div>
           <Text size="sm" mb="xs">
@@ -136,6 +164,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             max={priceRange[1]}
             value={filters.priceRange}
             onChange={handlePriceRangeChange}
+            step={100}
             marks={[
               { value: priceRange[0], label: `${priceRange[0].toLocaleString()}円` },
               { value: priceRange[1], label: `${priceRange[1].toLocaleString()}円` },

@@ -1,0 +1,28 @@
+.card {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: var(--mantine-shadow-md);
+  }
+}
+
+.imageSection {
+  position: relative;
+  overflow: hidden;
+}
+
+.imageSection img {
+  transition: transform 500ms ease;
+}
+
+.card:hover .imageSection img {
+  transform: scale(1.1);
+}
+
+.favoriteButton {
+  position: absolute;
+  top: var(--mantine-spacing-md);
+  right: var(--mantine-spacing-md);
+  z-index: 1;
+}

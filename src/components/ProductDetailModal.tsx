@@ -8,13 +8,17 @@ import {
   Divider, 
   NumberFormatter, 
   Image, 
-  SimpleGrid,
   Anchor,
   ActionIcon,
-  ScrollArea
+  ScrollArea,
+  Title,
+  Paper,
+  Button
 } from '@mantine/core';
 import { IconHeart, IconHeartFilled, IconExternalLink } from '@tabler/icons-react';
 import { Product } from '../types/Product';
+import { Carousel } from '@mantine/carousel';
+import '@mantine/carousel/styles.css';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -40,127 +44,126 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       opened={opened}
       onClose={onClose}
       title={
-        <Group justify="space-between" w="100%">
-          <Text size="lg" fw={500} lineClamp={1}>
-            {product.name}
-          </Text>
-          <ActionIcon
-            variant={isFavorite ? "filled" : "light"}
-            color="red"
-            onClick={() => onToggleFavorite(product.id)}
-          >
-            {isFavorite ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
-          </ActionIcon>
-        </Group>
+        <Title order={3} size="h2">{product.name}</Title>
       }
-      size="lg"
+      size="xl"
       centered
+      scrollAreaComponent={ScrollArea.Autosize}
     >
-      <ScrollArea.Autosize mah={600}>
-        <Stack gap="md">
-          {/* Product Images */}
-          {product.images && product.images.length > 0 && (
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-              {product.images.map((image, index) => (
+      <Stack gap="lg">
+        {/* Product Images Carousel */}
+        {product.images && product.images.length > 0 && (
+          <Carousel withIndicators>
+            {product.images.map((image, index) => (
+              <Carousel.Slide key={index}>
                 <Image
-                  key={index}
                   src={image}
-                  height={200}
+                  height={300}
                   alt={`${product.name} - 画像${index + 1}`}
-                  fit="cover"
+                  fit="contain"
                   fallbackSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4="
                 />
-              ))}
-            </SimpleGrid>
-          )}
+              </Carousel.Slide>
+            ))}
+          </Carousel>
+        )}
 
-          {/* Product Info */}
-          <Group justify="space-between" align="flex-start">
-            <Stack gap="xs" style={{ flex: 1 }}>
-              <Group gap="xs">
-                <Text size="sm" c="dimmed">ID:</Text>
-                <Text size="sm">{product.id}</Text>
-              </Group>
-              <Badge color="blue" variant="light" w="fit-content">
-                {product.category}
-              </Badge>
-            </Stack>
+        {/* Product Info */}
+        <Group justify="space-between" align="flex-start">
+          <Stack gap="xs" style={{ flex: 1 }}>
+            <Badge size="lg" variant="light">
+              {product.category}
+            </Badge>
+            <Text c="dimmed">ID: {product.id}</Text>
+          </Stack>
+          <Group>
             {product.detail_url && (
-              <Anchor href={product.detail_url} target="_blank">
-                <Group gap={4}>
-                  <Text size="sm">詳細ページ</Text>
-                  <IconExternalLink size={16} />
-                </Group>
-              </Anchor>
+              <Button 
+                component="a" 
+                href={product.detail_url} 
+                target="_blank" 
+                variant="outline" 
+                leftSection={<IconExternalLink size={16} />}
+              >
+                詳細ページ
+              </Button>
             )}
+            <ActionIcon
+              variant={isFavorite ? 'filled' : 'outline'}
+              color="red"
+              size="lg"
+              onClick={() => onToggleFavorite(product.id)}
+            >
+              {isFavorite ? <IconHeartFilled size={20} /> : <IconHeart size={20} />}
+            </ActionIcon>
           </Group>
+        </Group>
 
-          {/* Product Detail */}
-          {product.detail && (
-            <>
-              <Divider />
-              <Stack gap="xs">
-                <Text size="sm" fw={500}>商品詳細:</Text>
-                <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
-                  {product.detail}
-                </Text>
-              </Stack>
-            </>
-          )}
+        {/* Product Detail */}
+        {product.detail && (
+          <Paper withBorder p="md" radius="md">
+            <Stack gap="xs">
+              <Title order={4} size="h4">商品詳細</Title>
+              <Text style={{ whiteSpace: 'pre-line' }}>
+                {product.detail}
+              </Text>
+            </Stack>
+          </Paper>
+        )}
 
-          <Divider />
+        <Divider />
 
-          {/* Price Information */}
+        {/* Price Information */}
+        <Paper withBorder p="md" radius="md">
           <Group justify="space-between">
-            <Text size="sm" fw={500}>
-              総額: <NumberFormatter value={product.totals} thousandSeparator="," />円
-            </Text>
-            <Text size="sm" c="dimmed">
-              商品点数: {product.items.length}点
-            </Text>
+            <Title order={4} size="h4">価格情報</Title>
+            <Stack gap={0} align="flex-end">
+              <Text size="sm" c="dimmed">総額</Text>
+              <Text size="xl" fw={700}>
+                <NumberFormatter value={product.totals} thousandSeparator suffix=" 円" />
+              </Text>
+            </Stack>
           </Group>
+        </Paper>
 
-          {/* Items List */}
-          <Stack gap="xs">
-            <Text size="sm" fw={500}>商品内容:</Text>
-            {product.items.map((item, index) => (
-              <Group key={index} justify="space-between" align="center" p="xs" style={{ 
-                backgroundColor: 'var(--mantine-color-gray-0)', 
-                borderRadius: 'var(--mantine-radius-sm)' 
-              }}>
+        {/* Items List */}
+        <Stack gap="xs">
+          <Title order={4} size="h4">商品内容 ({product.items.length}点)</Title>
+          {product.items.map((item, index) => (
+            <Paper key={index} withBorder p="sm" radius="md">
+              <Group justify="space-between" align="center">
                 <Anchor
                   href={item.url}
                   target="_blank"
-                  size="sm"
                   lineClamp={2}
                   style={{ flex: 1 }}
                 >
                   {item.name}
                 </Anchor>
-                <Group gap="xs">
+                <Stack gap={0} align="flex-end">
+                  <Text fw={500}>
+                    <NumberFormatter value={item.price} thousandSeparator suffix=" 円" />
+                  </Text>
                   <Text size="sm" c="dimmed">
                     {item.amount}個
                   </Text>
-                  <Text size="sm" fw={500}>
-                    <NumberFormatter value={item.price} thousandSeparator="," />円
-                  </Text>
-                </Group>
+                </Stack>
               </Group>
-            ))}
-          </Stack>
-
-          <Divider />
-          
-          <Group justify="space-between">
-            <Text size="sm" c="dimmed">
-              計算合計:
-            </Text>
-            <Text size="sm" fw={500}>
-              <NumberFormatter value={totalItemPrice} thousandSeparator="," />円
-            </Text>
-          </Group>
+            </Paper>
+          ))}
         </Stack>
-      </ScrollArea.Autosize>
+
+        <Divider />
+        
+        <Group justify="space-between">
+          <Text c="dimmed">
+            計算合計:
+          </Text>
+          <Text fw={500}>
+            <NumberFormatter value={totalItemPrice} thousandSeparator suffix=" 円" />
+          </Text>
+        </Group>
+      </Stack>
     </Modal>
   );
 };
