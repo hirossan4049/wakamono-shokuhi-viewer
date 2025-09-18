@@ -147,6 +147,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             <SegmentedControl
               value={viewMode}
               onChange={(value) => onViewModeChange(value as 'grid' | 'table')}
+              w={200}
               data={[
                 {
                   value: 'grid',

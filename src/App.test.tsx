@@ -1,6 +1,5 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
 test('renders application title', () => {
@@ -9,6 +8,6 @@ test('renders application title', () => {
       <App />
     </MantineProvider>
   );
-  const titleElement = screen.getByText(/若者食費ビューアー/i);
+  const titleElement = screen.getByText(/大阪府若者食費支援検索/i);
   expect(titleElement).toBeInTheDocument();
 });

@@ -1,16 +1,9 @@
-import React from 'react';
 import {
-  Card,
-  Text,
-  Badge,
-  Group,
-  Stack,
-  NumberFormatter,
-  Image,
   ActionIcon,
-  AspectRatio,
+  AspectRatio, Badge, Card, Group, Image, NumberFormatter, Stack, Text
 } from '@mantine/core';
 import { IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import React from 'react';
 import { Product } from '../types/Product';
 import classes from './ProductCard.module.css';
 
@@ -33,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, catego
       className={classes.card}
       onClick={() => onOpenDetail(product)}
     >
-      <Card.Section className={classes.imageSection}>
+      <Card.Section className={classes.imageSection} style={{ position: 'relative' }}>
         <AspectRatio ratio={16 / 9}>
           <Image
             src={product.thumb}
@@ -42,15 +35,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, catego
             fallbackSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4="
           />
         </AspectRatio>
+
         <ActionIcon
           className={classes.favoriteButton}
           variant={isFavorite ? 'filled' : 'light'}
           color={isFavorite ? 'red' : 'gray'}
           size="lg"
           radius="xl"
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            zIndex: 2,
+            transition: 'filter 0.2s ease'
+          }}
+          styles={{
+            root: {
+              '&:hover': {
+                filter: 'brightness(0.85)'
+              }
+            }
+          }}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite(product.id);
+          }}
+          onMouseEnter={(e) => {
+            const card = e.currentTarget.closest(`.${classes.card}`);
+            if (card) card.classList.add(classes.favoriteHovered);
+          }}
+          onMouseLeave={(e) => {
+            const card = e.currentTarget.closest(`.${classes.card}`);
+            if (card) card.classList.remove(classes.favoriteHovered);
           }}
         >
           {isFavorite ? <IconHeartFilled size={20} /> : <IconHeart size={20} />}
@@ -91,7 +107,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOpenDetail, catego
           </Text>
         </Stack>
       </Group>
-    </Card>
+    </Card >
   );
 };
 
