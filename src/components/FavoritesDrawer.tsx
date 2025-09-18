@@ -1,4 +1,4 @@
-import { ActionIcon, Avatar, Badge, Drawer, Group, ScrollArea, Stack, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Avatar, Badge, Drawer, Group, NumberFormatter, ScrollArea, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { IconExternalLink, IconHeart, IconHeartFilled } from '@tabler/icons-react';
 import React from 'react';
 import { Product } from '../types/Product';
@@ -38,6 +38,9 @@ const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
                     </Text>
                     <Group gap={6} wrap="wrap">
                       <Badge size="xs" variant="light" color="blue">{p.category}</Badge>
+                      <Badge size="xs" variant="light" color="green">
+                        <NumberFormatter value={p.totals} thousandSeparator suffix=" 円" />
+                      </Badge>
                       <Badge size="xs" variant="light" color="gray">{p.items.length} 点</Badge>
                     </Group>
                   </Stack>
@@ -71,4 +74,3 @@ const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
 };
 
 export default React.memo(FavoritesDrawer);
-
