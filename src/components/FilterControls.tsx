@@ -232,6 +232,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
             onChangeEnd={handlePriceRangeChangeEnd}
             step={100}
             size="sm"
+            mx={16}
             disabled={disabled}
             labelAlwaysOn
             label={(value) => `${value.toLocaleString()}円`}

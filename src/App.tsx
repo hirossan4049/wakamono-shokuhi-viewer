@@ -1,10 +1,11 @@
-import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper } from '@mantine/core';
+import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper, Indicator, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconReceipt2 } from '@tabler/icons-react';
+import { IconHeart, IconReceipt2 } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
 // Upload UI moved to header FileButton; legacy upload component removed from main screen
 import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
+import FavoritesDrawer from './components/FavoritesDrawer';
 import { useFavorites } from './hooks/useFavorites';
 import { FilterState, Product, ProductData } from './types/Product';
 import { getCountsFromDB, getDataSourceFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
@@ -25,7 +26,8 @@ function App() {
   });
   const [, startTransition] = useTransition();
 
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const [favoritesOpened, setFavoritesOpened] = useState(false);
 
   // Calculate available categories and price range from data
   const { categories, priceRange } = useMemo(() => {
@@ -262,6 +264,13 @@ function App() {
                   {productData.products.length}件の商品
                 </Badge>
               )}
+              <Tooltip label="お気に入り一覧">
+                <Indicator inline size={16} disabled={!favorites?.length} label={favorites?.length} color="red" offset={4}>
+                  <ActionIcon variant="light" color="red" size="lg" aria-label="お気に入り一覧" onClick={() => setFavoritesOpened(true)}>
+                    <IconHeart size={20} />
+                  </ActionIcon>
+                </Indicator>
+              </Tooltip>
               <FileButton onChange={handleFileSelect} accept="application/json,.json">
                 {(props) => (
                   <Button variant="light" {...props}>
@@ -308,6 +317,18 @@ function App() {
         isFavorite={selectedProduct ? isFavorite(selectedProduct.id) : false}
         onToggleFavorite={toggleFavorite}
         categories={selectedProduct ? categoriesById[selectedProduct.id] || (selectedProduct.category ? [selectedProduct.category] : []) : []}
+      />
+
+      <FavoritesDrawer
+        opened={favoritesOpened}
+        onClose={() => setFavoritesOpened(false)}
+        products={(productData?.products || []).filter((p) => favorites?.includes(p.id))}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+        onOpenDetail={(p) => {
+          setFavoritesOpened(false);
+          handleOpenDetail(p);
+        }}
       />
     </AppShell>
   );
