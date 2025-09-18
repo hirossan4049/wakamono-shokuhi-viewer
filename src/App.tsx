@@ -1,7 +1,7 @@
 import { ActionIcon, AppShell, Badge, Burger, Button, Container, Divider, Drawer, FileButton, Group, Indicator, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconHeart, IconReceipt2 } from '@tabler/icons-react';
+import { IconHeart, IconReceipt2, IconBrandGithub } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
 // Upload UI moved to header FileButton; legacy upload component removed from main screen
 import FavoritesDrawer from './components/FavoritesDrawer';
@@ -269,6 +269,19 @@ function App() {
                   {productData.products.length}件の商品
                 </Badge>
               )}
+              <Tooltip label="GitHub">
+                <ActionIcon
+                  component="a"
+                  href="https://github.com/hirossan4049/wakamono-shokuhi-viewer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="subtle"
+                  size="lg"
+                  aria-label="GitHub"
+                >
+                  <IconBrandGithub size={20} />
+                </ActionIcon>
+              </Tooltip>
               <Tooltip label="お気に入り一覧">
                 <Indicator inline size={16} disabled={!favorites?.length} label={favorites?.length} color="red" offset={4}>
                   <ActionIcon variant="light" color="red" size="lg" aria-label="お気に入り一覧" onClick={() => setFavoritesOpened(true)}>
@@ -296,6 +309,16 @@ function App() {
               {productData.products.length}件の商品
             </Badge>
           )}
+          <Button
+            component="a"
+            href="https://github.com/hirossan4049/wakamono-shokuhi-viewer"
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="light"
+            leftSection={<IconBrandGithub size={18} />}
+          >
+            GitHub
+          </Button>
           <Button
             variant="light"
             leftSection={<IconHeart size={18} />}
