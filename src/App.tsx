@@ -9,12 +9,12 @@ import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
 import { useFavorites } from './hooks/useFavorites';
 import { FilterState, Product, ProductData } from './types/Product';
-import { getCountsFromDB, getDataSourceFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
+import { getCountsFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
 
 function App() {
   if (process.env.NODE_ENV !== 'production') console.count('App render');
   const [productData, setProductData] = useState<ProductData | null>(null);
-  const [isSampleData, setIsSampleData] = useState<boolean>(false);
+  // const [isSampleData, setIsSampleData] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('name_asc');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -81,8 +81,8 @@ function App() {
       const data = await loadProductDataFromDB();
       if (data) {
         setProductData(data);
-        const source = await getDataSourceFromDB();
-        setIsSampleData(source === 'sample');
+        // const source = await getDataSourceFromDB();
+        // setIsSampleData(source === 'sample');
         const counts = await getCountsFromDB();
         notifications.show({
           title: 'IndexedDBから読み込み',
@@ -102,7 +102,7 @@ function App() {
           setProductData(sample);
           // Persist sample to IndexedDB for consistent UX and counts
           await saveProductDataToDB(sample, 'sample');
-          setIsSampleData(true);
+          // setIsSampleData(true);
           const counts = await getCountsFromDB();
           notifications.show({
             title: 'サンプルデータを読み込みました',
@@ -128,7 +128,7 @@ function App() {
     setProductData(data);
     try {
       await saveProductDataToDB(data, 'user');
-      setIsSampleData(false);
+      // setIsSampleData(false);
       const counts = await getCountsFromDB();
       notifications.show({
         title: 'IndexedDBへ保存しました',
