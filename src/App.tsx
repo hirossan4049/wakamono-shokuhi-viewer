@@ -1,7 +1,8 @@
-import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper, Indicator, Tooltip } from '@mantine/core';
+import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper, Indicator, Tooltip, Burger, Drawer, Stack, Divider } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconHeart, IconReceipt2 } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
+import { useDisclosure } from '@mantine/hooks';
 // Upload UI moved to header FileButton; legacy upload component removed from main screen
 import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
@@ -28,6 +29,7 @@ function App() {
 
   const { favorites, isFavorite, toggleFavorite } = useFavorites();
   const [favoritesOpened, setFavoritesOpened] = useState(false);
+  const [mobileMenuOpened, { toggle: toggleMobileMenu, close: closeMobileMenu }] = useDisclosure(false);
 
   // Calculate available categories and price range from data
   const { categories, priceRange } = useMemo(() => {
@@ -241,24 +243,27 @@ function App() {
 
   return (
     <AppShell
-      header={{ height: 80 }}
+      header={{ height: { base: 64, sm: 80 } }}
       padding="md"
     >
       <AppShell.Header>
         <Container size="xl" h="100%">
           <Group h="100%" justify="space-between" align="center">
-            <Group>
-              <IconReceipt2 size={32} />
+            <Group gap="sm">
+              <IconReceipt2 size={28} />
               <div>
-                <Title order={1} size="h2">
+                <Title order={1} size="h4" hiddenFrom="sm">
                   大阪府若者食費支援検索
                 </Title>
-                <Text size="sm" c="dimmed">
+                <Title order={1} size="h2" visibleFrom="sm">
+                  大阪府若者食費支援検索
+                </Title>
+                <Text size="sm" c="dimmed" visibleFrom="sm">
                   商品データの表示・検索・フィルタリング
                 </Text>
               </div>
             </Group>
-            <Group gap="sm">
+            <Group gap="sm" visibleFrom="sm">
               {productData && (
                 <Badge size="lg" variant="light">
                   {productData.products.length}件の商品
@@ -279,9 +284,38 @@ function App() {
                 )}
               </FileButton>
             </Group>
+            <Burger opened={mobileMenuOpened} onClick={toggleMobileMenu} size="sm" aria-label="メニュー" hiddenFrom="sm" />
           </Group>
         </Container>
       </AppShell.Header>
+
+      <Drawer opened={mobileMenuOpened} onClose={closeMobileMenu} position="right" size="xs" title="メニュー" padding="md" hiddenFrom="sm">
+        <Stack gap="md">
+          {productData && (
+            <Badge size="lg" variant="light">
+              {productData.products.length}件の商品
+            </Badge>
+          )}
+          <Button
+            variant="light"
+            leftSection={<IconHeart size={18} />}
+            onClick={() => {
+              closeMobileMenu();
+              setFavoritesOpened(true);
+            }}
+          >
+            お気に入り一覧
+          </Button>
+          <Divider my="xs" />
+          <FileButton onChange={(file) => { closeMobileMenu(); handleFileSelect(file); }} accept="application/json,.json">
+            {(props) => (
+              <Button variant="filled" {...props}>
+                JSONをアップロード
+              </Button>
+            )}
+          </FileButton>
+        </Stack>
+      </Drawer>
 
       <AppShell.Main>
         {mainContent}
