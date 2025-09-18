@@ -111,7 +111,7 @@ MIT License
 
 ## デモ
 
-🚀 **ライブデモ**: https://hirossan4049.github.io/wakamono-shokuhi-viewer
+🚀 **ライブデモ**: https://wakasearch.localhouse.jp/
 
 ## スクリーンショット
 
