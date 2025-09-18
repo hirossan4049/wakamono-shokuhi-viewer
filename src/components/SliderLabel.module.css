@@ -1,19 +1,25 @@
 .label {
-  top: 0;
-  height: 28px;
-  line-height: 28px;
-  width: 34px;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 700;
-  background-color: transparent;
+  top: 0 !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  width: 34px !important;
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-weight: 700 !important;
+  background-color: transparent !important;
 }
 
 .thumb {
-  background-color: var(--mantine-color-blue-6);
-  height: 28px;
-  width: 64px;
-  border: none;
+  background-color: var(--mantine-color-blue-6) !important;
+  height: 28px !important;
+  width: 64px !important;
+  border: none !important;
+}
+
+/* Optional: set Mantine slider variables on the root for more control */
+.root {
+  /* Controls both thumb width & height in Mantine v8 */
+  --slider-thumb-size: 28px;
 }
