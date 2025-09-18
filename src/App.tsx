@@ -120,7 +120,7 @@ function App() {
     })();
   }, []);
 
-  const handleFileLoad = async (data: ProductData) => {
+  const handleFileLoad = useCallback(async (data: ProductData) => {
     setProductData(data);
     try {
       await saveProductDataToDB(data, 'user');
@@ -141,7 +141,7 @@ function App() {
         color: 'red',
       });
     }
-  };
+  }, []);
 
   // Header file select handler (JSON upload)
   const handleFileSelect = React.useCallback((file: File | null) => {
