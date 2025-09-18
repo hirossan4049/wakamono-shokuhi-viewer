@@ -1,5 +1,5 @@
 import { ActionIcon, Badge, Group, Image, NumberFormatter, Stack, Table, Text } from '@mantine/core';
-import { IconExternalLink, IconEye, IconHeart, IconHeartFilled } from '@tabler/icons-react';
+import { IconExternalLink, IconHeart, IconHeartFilled } from '@tabler/icons-react';
 import React from 'react';
 import { useFilteredProducts } from '../hooks/useFilteredProducts';
 import { FilterState, Product } from '../types/Product';
@@ -73,16 +73,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
-          <ActionIcon
-            variant="light"
-            color="blue"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenDetail(product);
-            }}
-          >
-            <IconEye size={16} />
-          </ActionIcon>
           <ActionIcon
             variant={isFavorite(product.id) ? 'filled' : 'light'}
             color="red"

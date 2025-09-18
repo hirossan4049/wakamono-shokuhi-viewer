@@ -1,8 +1,8 @@
-import { AppShell, Badge, Container, Group, Stack, Text, Title } from '@mantine/core';
+import { AppShell, Badge, Button, Container, FileButton, Group, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconReceipt2 } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
-import FileUpload from './components/FileUpload';
+// Upload UI moved to header FileButton; legacy upload component removed from main screen
 import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
 import { useFavorites } from './hooks/useFavorites';
@@ -84,6 +84,34 @@ function App() {
             : `${data.products.length}件を読み込みました`,
           color: 'blue',
         });
+      } else {
+        // Fallback: load sample data from public when DB is empty
+        try {
+          const url = `${process.env.PUBLIC_URL || ''}/sample-data.json`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Failed to fetch sample: ${res.status}`);
+          const sample = (await res.json()) as ProductData;
+          if (!sample || !Array.isArray(sample.products)) throw new Error('Invalid sample data');
+          setProductData(sample);
+          // Persist sample to IndexedDB for consistent UX and counts
+          await saveProductDataToDB(sample);
+          const counts = await getCountsFromDB();
+          notifications.show({
+            title: 'サンプルデータを読み込みました',
+            message: counts
+              ? `products: ${counts.products}, items: ${counts.items}`
+              : `${sample.products.length}件を読み込みました`,
+            color: 'teal',
+          });
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to load sample data', e);
+          notifications.show({
+            title: 'サンプル読み込み失敗',
+            message: 'ネットワークまたはファイルの問題が発生しました。',
+            color: 'red',
+          });
+        }
       }
     })();
   }, []);
@@ -109,6 +137,44 @@ function App() {
       });
     }
   };
+
+  // Header file select handler (JSON upload)
+  const handleFileSelect = React.useCallback((file: File | null) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const result = e.target?.result as string;
+        const data = JSON.parse(result) as ProductData;
+        if (!data.products || !Array.isArray(data.products)) {
+          throw new Error('Invalid JSON structure: missing products array');
+        }
+        data.products.forEach((product, index) => {
+          if (!product.name || !product.id || !product.category) {
+            throw new Error(`Invalid product at index ${index}: missing required fields`);
+          }
+          if (!product.items || !Array.isArray(product.items)) {
+            throw new Error(`Invalid product at index ${index}: missing items array`);
+          }
+        });
+        await handleFileLoad(data);
+        notifications.show({
+          title: 'ファイルが読み込まれました',
+          message: `${data.products.length}件の商品データを読み込みました`,
+          color: 'green',
+        });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error parsing JSON:', error);
+        notifications.show({
+          title: 'エラー',
+          message: 'JSONファイルの解析に失敗しました。ファイル形式を確認してください。',
+          color: 'red',
+        });
+      }
+    };
+    reader.readAsText(file);
+  }, [handleFileLoad]);
 
   const handleResetFilters = useCallback(() => {
     setFilterState({
@@ -185,30 +251,26 @@ function App() {
                 </Text>
               </div>
             </Group>
-            {productData && (
-              <Badge size="lg" variant="light">
-                {productData.products.length}件の商品
-              </Badge>
-            )}
+            <Group gap="sm">
+              {productData && (
+                <Badge size="lg" variant="light">
+                  {productData.products.length}件の商品
+                </Badge>
+              )}
+              <FileButton onChange={handleFileSelect} accept="application/json,.json">
+                {(props) => (
+                  <Button variant="light" {...props}>
+                    JSONをアップロード
+                  </Button>
+                )}
+              </FileButton>
+            </Group>
           </Group>
         </Container>
       </AppShell.Header>
 
       <AppShell.Main>
-        {!productData ? (
-          <Container size="xl">
-            <Stack gap="lg">
-              <div>
-                <Title order={2} mb="md">
-                  JSONファイルをアップロード
-                </Title>
-                <FileUpload onFileLoad={handleFileLoad} />
-              </div>
-            </Stack>
-          </Container>
-        ) : (
-          mainContent
-        )}
+        {mainContent}
       </AppShell.Main>
 
       <ProductDetailModal
