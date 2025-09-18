@@ -1,12 +1,12 @@
-import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper, Indicator, Tooltip, Burger, Drawer, Stack, Divider } from '@mantine/core';
+import { ActionIcon, AppShell, Badge, Burger, Button, Container, Divider, Drawer, FileButton, Group, Indicator, Stack, Text, Title, Tooltip } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconHeart, IconReceipt2 } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
-import { useDisclosure } from '@mantine/hooks';
 // Upload UI moved to header FileButton; legacy upload component removed from main screen
+import FavoritesDrawer from './components/FavoritesDrawer';
 import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
-import FavoritesDrawer from './components/FavoritesDrawer';
 import { useFavorites } from './hooks/useFavorites';
 import { FilterState, Product, ProductData } from './types/Product';
 import { getCountsFromDB, getDataSourceFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
@@ -321,7 +321,7 @@ function App() {
         {mainContent}
       </AppShell.Main>
 
-      {isSampleData && (
+      {/* {isSampleData && (
         <Affix position={{ top: 16, right: 16 }}>
           <Popover position="bottom-end" shadow="md" radius="md" defaultOpened>
             <Popover.Target>
@@ -342,7 +342,7 @@ function App() {
             </Popover.Dropdown>
           </Popover>
         </Affix>
-      )}
+      )} */}
 
       <ProductDetailModal
         product={selectedProduct}
