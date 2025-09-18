@@ -1,4 +1,4 @@
-import { AppShell, Badge, Button, Container, FileButton, Group, Stack, Text, Title } from '@mantine/core';
+import { AppShell, Badge, Button, Container, FileButton, Group, Text, Title, Affix, Popover, ActionIcon, Anchor, Paper } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconReceipt2 } from '@tabler/icons-react';
 import React, { useCallback, useMemo, useState, useTransition } from 'react';
@@ -7,11 +7,12 @@ import MainContent from './components/MainContent';
 import ProductDetailModal from './components/ProductDetailModal';
 import { useFavorites } from './hooks/useFavorites';
 import { FilterState, Product, ProductData } from './types/Product';
-import { getCountsFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
+import { getCountsFromDB, getDataSourceFromDB, loadProductDataFromDB, saveProductDataToDB } from './utils/indexedDB';
 
 function App() {
   if (process.env.NODE_ENV !== 'production') console.count('App render');
   const [productData, setProductData] = useState<ProductData | null>(null);
+  const [isSampleData, setIsSampleData] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>('name_asc');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -76,6 +77,8 @@ function App() {
       const data = await loadProductDataFromDB();
       if (data) {
         setProductData(data);
+        const source = await getDataSourceFromDB();
+        setIsSampleData(source === 'sample');
         const counts = await getCountsFromDB();
         notifications.show({
           title: 'IndexedDBから読み込み',
@@ -94,7 +97,8 @@ function App() {
           if (!sample || !Array.isArray(sample.products)) throw new Error('Invalid sample data');
           setProductData(sample);
           // Persist sample to IndexedDB for consistent UX and counts
-          await saveProductDataToDB(sample);
+          await saveProductDataToDB(sample, 'sample');
+          setIsSampleData(true);
           const counts = await getCountsFromDB();
           notifications.show({
             title: 'サンプルデータを読み込みました',
@@ -119,7 +123,8 @@ function App() {
   const handleFileLoad = async (data: ProductData) => {
     setProductData(data);
     try {
-      await saveProductDataToDB(data);
+      await saveProductDataToDB(data, 'user');
+      setIsSampleData(false);
       const counts = await getCountsFromDB();
       notifications.show({
         title: 'IndexedDBへ保存しました',
@@ -272,6 +277,29 @@ function App() {
       <AppShell.Main>
         {mainContent}
       </AppShell.Main>
+
+      {isSampleData && (
+        <Affix position={{ top: 16, right: 16 }}>
+          <Popover position="bottom-end" shadow="md" radius="md" defaultOpened>
+            <Popover.Target>
+              <ActionIcon size="lg" variant="filled" color="teal" aria-label="サンプルデータ情報">
+                <IconReceipt2 size={18} />
+              </ActionIcon>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <Paper>
+                <Title order={6} mb={4}>サンプルデータ表示中</Title>
+                <Text size="sm" mb={8}>
+                  現在はサンプルデータを表示しています。boothで全データをご購入いただけます。
+                </Text>
+                <Anchor href="https://www.google.com" target="_blank" rel="noopener noreferrer">
+                  購入ページを開く
+                </Anchor>
+              </Paper>
+            </Popover.Dropdown>
+          </Popover>
+        </Affix>
+      )}
 
       <ProductDetailModal
         product={selectedProduct}

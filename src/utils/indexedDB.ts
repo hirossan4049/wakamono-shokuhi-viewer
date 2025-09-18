@@ -54,7 +54,10 @@ function tx(db: IDBDatabaseEx, mode: IDBTransactionMode, stores: string[]): IDBT
 export type NormalizedItem = ProductItem & { productId: string; index: number };
 
 // Normalize and save ProductData into IndexedDB
-export async function saveProductDataToDB(data: ProductData): Promise<void> {
+export async function saveProductDataToDB(
+  data: ProductData,
+  source: 'sample' | 'user' = 'user'
+): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = tx(db, 'readwrite', [STORE_PRODUCTS, STORE_ITEMS, STORE_META]);
@@ -81,6 +84,7 @@ export async function saveProductDataToDB(data: ProductData): Promise<void> {
     // Save meta info
     metaStore.put({ key: 'lastImportedAt', value: new Date().toISOString() });
     metaStore.put({ key: 'counts', value: { products: data.products.length } });
+    metaStore.put({ key: 'dataSource', value: source });
   });
 }
 
@@ -129,6 +133,24 @@ export async function clearDB(): Promise<void> {
     transaction.objectStore(STORE_ITEMS).clear();
     transaction.objectStore(STORE_META).clear();
   });
+}
+
+export async function getDataSourceFromDB(): Promise<'sample' | 'user' | null> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = tx(db, 'readonly', [STORE_META]);
+      const metaStore = transaction.objectStore(STORE_META);
+      const req = metaStore.get('dataSource');
+      req.onsuccess = () => {
+        const val = (req.result && (req.result as any).value) as 'sample' | 'user' | undefined;
+        resolve(val ?? null);
+      };
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return null;
+  }
 }
 
 // Load all products and reconstruct ProductData
